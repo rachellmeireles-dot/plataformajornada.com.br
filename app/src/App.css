@@ -1,0 +1,309 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f4f6f9;
+  color: #1f2937;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.pagina {
+  min-height: 100vh;
+  width: 100%;
+}
+
+.cabecalho {
+  background: linear-gradient(135deg, #0d47a1, #1565c0);
+  color: #ffffff;
+  padding: 40px 20px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+.cabecalho-conteudo {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 30px;
+}
+
+.cabecalho h1 {
+  color: #ffffff;
+  font-size: 42px;
+  margin: 8px 0;
+}
+
+.cabecalho p {
+  color: #ffffff;
+}
+
+.marca {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+
+.resumo {
+  min-width: 220px;
+  padding: 18px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.resumo strong {
+  font-size: 30px;
+  color: #ffffff;
+}
+
+.resumo span {
+  color: #ffffff;
+  margin-top: 4px;
+}
+
+.container {
+  width: 94%;
+  max-width: 1200px;
+  margin: 30px auto;
+}
+
+.card {
+  background: #ffffff;
+  padding: 28px;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  margin-bottom: 28px;
+}
+
+.titulo-card,
+.titulo-lista {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.titulo-card h2,
+.titulo-lista h2 {
+  color: #0d47a1;
+  margin-bottom: 5px;
+}
+
+.titulo-card p,
+.titulo-lista p {
+  color: #6b7280;
+}
+
+.grade-formulario {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #374151;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #1f2937;
+  outline: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #1565c0;
+  box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.15);
+}
+
+textarea {
+  margin-top: 18px;
+  min-height: 110px;
+  resize: vertical;
+}
+
+.acoes-formulario {
+  margin-top: 22px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+button {
+  border: none;
+  border-radius: 8px;
+  padding: 11px 20px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: 0.2s;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  opacity: 0.92;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.botao-principal,
+.botao-editar {
+  background: #1565c0;
+  color: #ffffff;
+}
+
+.botao-limpar,
+.botao-secundario,
+.botao-excluir {
+  background: #d32f2f;
+  color: #ffffff;
+}
+
+.botao-whatsapp {
+  background: #25d366;
+  color: #ffffff;
+}
+
+.campo-busca {
+  width: 340px;
+}
+
+.tabela-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  min-width: 850px;
+}
+
+th {
+  background: #0d47a1;
+  color: #ffffff;
+  padding: 14px;
+  text-align: left;
+}
+
+td {
+  padding: 13px 14px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+}
+
+tbody tr:hover {
+  background: #f8fafc;
+}
+
+td strong {
+  display: block;
+}
+
+td small {
+  display: block;
+  margin-top: 4px;
+  color: #6b7280;
+}
+
+.status {
+  display: inline-block;
+  background: #1565c0;
+  color: #ffffff;
+  padding: 5px 11px;
+  border-radius: 20px;
+  font-size: 13px;
+}
+
+.acoes-tabela {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.acoes-tabela button {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.mensagem {
+  padding: 14px;
+  margin-bottom: 18px;
+  border-radius: 8px;
+}
+
+.sucesso {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.erro {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.estado-lista {
+  text-align: center;
+  color: #6b7280;
+  padding: 30px;
+}
+
+@media (max-width: 800px) {
+  .cabecalho-conteudo,
+  .titulo-card,
+  .titulo-lista {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .cabecalho h1 {
+    font-size: 32px;
+  }
+
+  .resumo {
+    min-width: auto;
+  }
+
+  .grade-formulario {
+    grid-template-columns: 1fr;
+  }
+
+  .campo-busca {
+    width: 100%;
+  }
+
+  .card {
+    padding: 20px;
+  }
+}
