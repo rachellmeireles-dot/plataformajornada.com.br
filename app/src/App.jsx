@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { supabase } from './supabase'
 import './App.css'
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts'
+import * as XLSX from 'xlsx'
+import { jsPDF } from 'jspdf'
+import { autoTable } from 'jspdf-autotable'
 
 const formularioVazio = {
   nome: '',
@@ -13,38 +18,193 @@ const formularioVazio = {
   status: 'Apoiador',
   observacoes: '',
 }
+function Login({ onLogin }) {
+  const [email, setEmail] = useState('')
+  const [senha, setSenha] = useState('')
+  const [erroLogin, setErroLogin] = useState('')
 
+  async function entrar(e) {
+    e.preventDefault()
+    setErroLogin('')
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password: senha,
+    })
+
+    if (error) {
+      setErroLogin(error.message)
+      return
+    }
+
+    onLogin(data.session)
+  }
+
+  return (
+    <main className="pagina-login">
+      <form className="card-login" onSubmit={entrar}>
+        <h1>Plataforma Jornada</h1>
+        <p>Entre com seu e-mail e senha</p>
+
+        <input
+          type="email"
+          placeholder="E-mail"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+
+        <input
+          type="password"
+          placeholder="Senha"
+          value={senha}
+          onChange={(e) => setSenha(e.target.value)}
+          required
+        />
+
+        {erroLogin && <div className="mensagem erro">{erroLogin}</div>}
+
+        <button type="submit" className="botao-principal">
+          Entrar
+        </button>
+      </form>
+    </main>
+  )
+}
 function App() {
   const [formulario, setFormulario] = useState(formularioVazio)
   const [apoiadores, setApoiadores] = useState([])
   const [busca, setBusca] = useState('')
   const [editandoId, setEditandoId] = useState(null)
+  const [sessao, setSessao] = useState(null)
+  const usuario = sessao?.user
+  const [perfil, setPerfil] = useState(null)
   const [carregando, setCarregando] = useState(false)
   const [mensagem, setMensagem] = useState('')
   const [erro, setErro] = useState('')
 
   useEffect(() => {
-    buscarApoiadores()
-  }, [])
+  buscarApoiadores()
 
-  async function buscarApoiadores() {
-    setCarregando(true)
-    setErro('')
+  supabase.auth.getSession().then(({ data }) => {
+    setSessao(data.session)
+  })
 
-    const { data, error } = await supabase
-      .from('apoiadores')
-      .select('*')
-      .order('created_at', { ascending: false })
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((_event, session) => {
+    setSessao(session)
+  })
 
-    if (error) {
-      setErro(`Erro ao carregar apoiadores: ${error.message}`)
-    } else {
-      setApoiadores(data || [])
+  return () => {
+    subscription.unsubscribe()
+  }
+}, [])
+useEffect(() => {
+  async function buscarPerfil() {
+    if (!sessao?.user?.id) {
+      setPerfil(null)
+      return
     }
 
-    setCarregando(false)
+    const { data, error } = await supabase
+      .from('perfis')
+      .select('id, nome, role')
+      .eq('id', sessao.user.id)
+      .single()
+
+    if (error) {
+      console.error('Erro ao carregar perfil:', error.message)
+      setPerfil(null)
+      return
+    }
+
+    setPerfil(data)
   }
 
+  buscarPerfil()
+}, [sessao])
+async function buscarApoiadores() {
+  setCarregando(true)
+  setErro('')
+
+  const { data, error } = await supabase
+    .from('apoiadores')
+    .select('*')
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    setErro(`Erro ao carregar apoiadores: ${error.message}`)
+  } else {
+    setApoiadores(data || [])
+  }
+
+  setCarregando(false)
+}
+const dadosPorBairro = useMemo(() => {
+  const contagem = {}
+
+  apoiadores.forEach((apoiador) => {
+    const bairro =
+  apoiador.bairro?.trim().toLowerCase() || 'não informado'
+    contagem[bairro] = (contagem[bairro] || 0) + 1
+  })
+
+ return Object.entries(contagem).map(([bairro, quantidade]) => ({
+  bairro:
+    bairro === 'não informado'
+      ? 'Não informado'
+      : bairro
+          .split(' ')
+          .map((palavra) =>
+            palavra.charAt(0).toUpperCase() + palavra.slice(1)
+          )
+          .join(' '),
+  quantidade,
+}))
+}, [apoiadores])
+const dadosPorZona = useMemo(() => {
+  const contagem = {}
+
+  apoiadores.forEach((apoiador) => {
+    const zona =
+      apoiador.zona?.trim().toLowerCase() || 'não informado'
+
+    contagem[zona] = (contagem[zona] || 0) + 1
+  })
+
+  return Object.entries(contagem).map(([zona, quantidade]) => ({
+    zona:
+      zona === 'não informado'
+        ? 'Não informado'
+        : zona
+            .split(' ')
+            .map(
+              (palavra) =>
+                palavra.charAt(0).toUpperCase() + palavra.slice(1)
+            )
+            .join(' '),
+    quantidade,
+  }))
+}, [apoiadores])
+const apoiadoresFiltrados = useMemo(() => {
+  if (!busca) return apoiadores
+
+  return apoiadores.filter((a) =>
+    (
+      a.nome +
+      a.telefone +
+      a.bairro +
+      a.zona
+    )
+      .toLowerCase()
+      .includes(busca.toLowerCase())
+  )
+}, [apoiadores, busca])
+if (!sessao) {
+  return <Login onLogin={setSessao} />
+}
+    
   function alterarCampo(e) {
     const { name, value } = e.target
     setFormulario((f) => ({
@@ -130,26 +290,67 @@ function App() {
     buscarApoiadores()
   }
 
-  function abrirWhatsApp(telefone) {
-    const numero = telefone.replace(/\D/g, '')
-    window.open(`https://wa.me/55${numero}`)
-  }
+ function abrirWhatsApp(telefone, nome) {
+  const numero = telefone.replace(/\D/g, '')
 
-  const apoiadoresFiltrados = useMemo(() => {
-    if (!busca) return apoiadores
+  const mensagem = encodeURIComponent(
+    `Olá, ${nome}! Tudo bem? Estou entrando em contato pela Plataforma Jornada.`
+  )
 
-    return apoiadores.filter((a) =>
-      (
-        a.nome +
-        a.telefone +
-        a.bairro +
-        a.zona
-      )
-        .toLowerCase()
-        .includes(busca.toLowerCase())
-    )
-  }, [apoiadores, busca])
+  window.open(`https://wa.me/55${numero}?text=${mensagem}`)
+}
+  
+function exportarExcel() {
+  const dados = apoiadores.map((apoiador) => ({
+    Nome: apoiador.nome,
+    Telefone: apoiador.telefone,
+    Bairro: apoiador.bairro,
+    Zona: apoiador.zona,
+    Comunidade: apoiador.comunidade,
+    Email: apoiador.email,
+    Responsável: apoiador.responsavel,
+    Status: apoiador.status,
+    Observações: apoiador.observacoes,
+  }))
 
+  const planilha = XLSX.utils.json_to_sheet(dados)
+  const arquivo = XLSX.utils.book_new()
+
+  XLSX.utils.book_append_sheet(arquivo, planilha, 'Apoiadores')
+  XLSX.writeFile(arquivo, 'apoiadores.xlsx')
+}
+function exportarPDF() {
+  const doc = new jsPDF({
+    orientation: 'landscape',
+    unit: 'mm',
+    format: 'a4',
+  })
+
+  doc.setFontSize(16)
+  doc.text('Relatório de apoiadores', 14, 15)
+
+  const linhas = apoiadores.map((apoiador) => [
+    apoiador.nome || '',
+    apoiador.telefone || '',
+    apoiador.bairro || '',
+    apoiador.zona || '',
+    apoiador.responsavel || '',
+    apoiador.status || '',
+  ])
+
+  autoTable(doc, {
+    startY: 22,
+    head: [
+      ['Nome', 'Telefone', 'Bairro', 'Zona', 'Responsável', 'Status'],
+    ],
+    body: linhas,
+    styles: {
+      fontSize: 8,
+    },
+  })
+
+  doc.save('apoiadores.pdf')
+}
   return (
     <main className="pagina">
 
@@ -177,9 +378,24 @@ function App() {
 
           </div>
 
+ <div className="usuario-logado">
+  <span>{usuario?.email}</span>
+{perfil && <small>Perfil: {perfil.role}</small>}
+  <button
+    type="button"
+    className="botao-secundario"
+    onClick={() => supabase.auth.signOut()}
+  >
+    Sair
+  </button>
+</div>
+
+
+
         </div>
 
       </header>      <section className="container">
+        {['admin', 'coordenador'].includes(perfil?.role) && (
         <article className="card">
           <div className="titulo-card">
             <div>
@@ -348,17 +564,35 @@ function App() {
             </div>
           </form>
         </article>
-
+        )}
         <article className="card">
           <div className="titulo-lista">
             <div>
               <h2>Apoiadores cadastrados</h2>
 
               <p>
-                {apoiadoresFiltrados.length} registros encontrados
-              </p>
+  {apoiadores.length} registros encontrados
+</p>
             </div>
+            {perfil?.role !== 'consulta' && (
+  <>
+    <button
+      type="button"
+      className="botao-secundario"
+      onClick={exportarExcel}
+    >
+      Exportar Excel
+    </button>
 
+    <button
+      type="button"
+      className="botao-secundario"
+      onClick={exportarPDF}
+    >
+      Exportar PDF
+    </button>
+  </>
+)}
             <input
               type="search"
               className="campo-busca"
@@ -366,6 +600,35 @@ function App() {
               onChange={(e) => setBusca(e.target.value)}
               placeholder="Buscar por nome, telefone ou bairro"
             />
+            
+            <div style={{ width: '100%', height: 320, margin: '20px 0' }}>
+              <h3 style={{ textAlign: 'center', margin: '20px 0 0' }}>
+  Bairro
+</h3>
+  <ResponsiveContainer>
+    <BarChart data={dadosPorBairro}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="bairro" />
+      <YAxis />
+      <Tooltip />
+      <Bar dataKey="quantidade" fill="#2563eb" />
+    </BarChart>
+  </ResponsiveContainer>
+</div>
+<h3 style={{ textAlign: 'center', margin: '20px 0 0' }}>
+  Apoiadores por zona
+</h3>
+<div style={{ width: '100%', height: 320, margin: '20px 0' }}>
+  <ResponsiveContainer>
+    <BarChart data={dadosPorZona}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="zona" />
+      <YAxis />
+      <Tooltip />
+      <Bar dataKey="quantidade" fill="#16a34a" />
+    </BarChart>
+  </ResponsiveContainer>
+</div>
           </div>          {apoiadoresFiltrados.length === 0 ? (
             <p className="estado-lista">
               Nenhum apoiador encontrado.
@@ -410,14 +673,12 @@ function App() {
                       <td>
                         <div className="acoes-tabela">
                           <button
-                            type="button"
-                            className="botao-whatsapp"
-                            onClick={() =>
-                              abrirWhatsApp(apoiador.telefone)
-                            }
-                          >
-                            WhatsApp
-                          </button>
+  type="button"
+  className="botao-whatsapp"
+  onClick={() => abrirWhatsApp(apoiador.telefone, apoiador.nome)}
+>
+  WhatsApp
+</button>
 
                           <button
                             type="button"
@@ -451,5 +712,6 @@ function App() {
     </main>
   )
 }
+
 
 export default App
