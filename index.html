@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Plataforma Jornada - Gestão de apoiadores" />
+  <title>Plataforma Jornada</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div>
+        <div class="brand">
+          <div class="brand-mark">J</div>
+          <div>
+            <h1>Jornada</h1>
+            <span>Gestão de apoiadores</span>
+          </div>
+        </div>
+
+        <nav class="nav">
+          <button class="nav-item active" data-view="dashboard">Painel</button>
+          <button class="nav-item" data-view="cadastro">Novo apoiador</button>
+          <button class="nav-item" data-view="lista">Apoiadores</button>
+        </nav>
+      </div>
+
+      <div class="sidebar-footer">
+        <small>Versão inicial</small>
+        <strong>Plataforma Jornada</strong>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Plataforma Jornada</p>
+          <h2 id="page-title">Painel principal</h2>
+        </div>
+        <button class="primary-btn" id="quick-add">+ Novo apoiador</button>
+      </header>
+
+      <section id="dashboard-view" class="view active">
+        <div class="cards">
+          <article class="card metric">
+            <span>Total de apoiadores</span>
+            <strong id="total-supporters">0</strong>
+          </article>
+          <article class="card metric">
+            <span>Cadastros hoje</span>
+            <strong id="today-supporters">0</strong>
+          </article>
+          <article class="card metric">
+            <span>Bairros alcançados</span>
+            <strong id="neighborhood-count">0</strong>
+          </article>
+        </div>
+
+        <div class="grid-2">
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <p class="eyebrow">Resumo</p>
+                <h3>Últimos cadastros</h3>
+              </div>
+              <button class="text-btn" data-view="lista">Ver todos</button>
+            </div>
+            <div id="recent-list" class="empty-state">Nenhum apoiador cadastrado ainda.</div>
+          </article>
+
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <p class="eyebrow">Alcance</p>
+                <h3>Apoiadores por bairro</h3>
+              </div>
+            </div>
+            <div id="neighborhood-chart" class="empty-state">Os bairros aparecerão aqui após os cadastros.</div>
+          </article>
+        </div>
+      </section>
+
+      <section id="cadastro-view" class="view">
+        <article class="card form-card">
+          <div class="card-header">
+            <div>
+              <p class="eyebrow">Cadastro</p>
+              <h3>Novo apoiador</h3>
+            </div>
+          </div>
+
+          <form id="supporter-form">
+            <div class="form-grid">
+              <label>
+                Nome completo *
+                <input type="text" id="name" required placeholder="Digite o nome completo" />
+              </label>
+              <label>
+                Telefone / WhatsApp *
+                <input type="tel" id="phone" required placeholder="(92) 99999-9999" />
+              </label>
+              <label>
+                Bairro *
+                <input type="text" id="neighborhood" required placeholder="Ex.: Centro" />
+              </label>
+              <label>
+                Zona
+                <select id="zone">
+                  <option value="">Selecione</option>
+                  <option>Centro-Sul</option>
+                  <option>Centro-Oeste</option>
+                  <option>Leste</option>
+                  <option>Norte</option>
+                  <option>Oeste</option>
+                  <option>Sul</option>
+                  <option>Rural</option>
+                </select>
+              </label>
+              <label>
+                Comunidade
+                <input type="text" id="community" placeholder="Nome da comunidade" />
+              </label>
+              <label>
+                E-mail
+                <input type="email" id="email" placeholder="nome@email.com" />
+              </label>
+              <label>
+                Responsável pelo cadastro
+                <input type="text" id="owner" placeholder="Nome da pessoa da equipe" />
+              </label>
+              <label>
+                Status
+                <select id="status">
+                  <option>Apoiador</option>
+                  <option>Voluntário</option>
+                  <option>Liderança</option>
+                  <option>Contato inicial</option>
+                </select>
+              </label>
+              <label class="full-width">
+                Observações
+                <textarea id="notes" rows="4" placeholder="Informações importantes sobre o apoiador"></textarea>
+              </label>
+            </div>
+
+            <div class="form-actions">
+              <button type="reset" class="secondary-btn">Limpar</button>
+              <button type="submit" class="primary-btn">Salvar apoiador</button>
+            </div>
+          </form>
+        </article>
+      </section>
+
+      <section id="lista-view" class="view">
+        <article class="card">
+          <div class="card-header list-header">
+            <div>
+              <p class="eyebrow">Base de dados</p>
+              <h3>Apoiadores cadastrados</h3>
+            </div>
+            <button class="secondary-btn" id="export-csv">Exportar CSV</button>
+          </div>
+
+          <div class="search-row">
+            <input type="search" id="search" placeholder="Buscar por nome, telefone ou bairro" />
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Telefone</th>
+                  <th>Bairro</th>
+                  <th>Status</th>
+                  <th>Cadastro</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="supporters-table"></tbody>
+            </table>
+          </div>
+
+          <div id="table-empty" class="empty-state">Nenhum apoiador cadastrado.</div>
+        </article>
+      </section>
+
+      <div id="toast" class="toast" role="status"></div>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
