@@ -43,7 +43,11 @@ function Login({ onLogin }) {
   return (
     <main className="pagina-login">
       <form className="card-login" onSubmit={entrar}>
-        <h1>Plataforma Jornada</h1>
+        <h1>
+  Plataforma
+  <br />
+  Jornada
+</h1>
         <p>Entre com seu e-mail e senha</p>
 
         <input
