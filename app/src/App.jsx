@@ -684,7 +684,8 @@ function exportarPDF() {
   WhatsApp
 </button>
 
-                          <button
+{['admin', 'coordenador'].includes(perfil?.role) && (
+  <>                         <button
                             type="button"
                             className="botao-editar"
                             onClick={() => editarApoiador(apoiador)}
@@ -699,6 +700,8 @@ function exportarPDF() {
                           >
                             Excluir
                           </button>
+                          </>
+)}
                         </div>
                       </td>
                     </tr>
