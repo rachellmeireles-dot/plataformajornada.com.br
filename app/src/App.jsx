@@ -132,11 +132,31 @@ async function buscarApoiadores() {
   setCarregando(true)
   setErro('')
 
-  const { data, error } = await supabase
+  let data = []
+let error = null
+let inicio = 0
+const tamanhoPagina = 1000
+
+while (true) {
+  const { data: pagina, error: paginaErro } = await supabase
     .from('apoiadores')
     .select('*')
     .order('created_at', { ascending: false })
+    .range(inicio, inicio + tamanhoPagina - 1)
 
+  if (paginaErro) {
+    error = paginaErro
+    break
+  }
+
+  data = [...data, ...(pagina || [])]
+
+  if (!pagina || pagina.length < tamanhoPagina) {
+    break
+  }
+
+  inicio += tamanhoPagina
+}
   if (error) {
     setErro(`Erro ao carregar apoiadores: ${error.message}`)
   } else {
