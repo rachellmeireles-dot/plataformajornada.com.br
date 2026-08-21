@@ -88,7 +88,8 @@ textarea {
 
 .cabecalho h1 {
   font-size: 38px;
-  margin: 7px 0;
+  color: white;
+  margin: 0;
 }
 
 .marca {
@@ -315,7 +316,7 @@ td {
   }
 
   .cabecalho h1 {
-    font-size: 29px;
+    font-size: 36px;
   }
 
   .usuario-logado {
@@ -372,8 +373,9 @@ td {
   }
 
   .cabecalho h1 {
-    font-size: 26px;
-  }
+    font-size: 36px;
+    color: white;
+    }
 
   .card {
     padding: 15px;

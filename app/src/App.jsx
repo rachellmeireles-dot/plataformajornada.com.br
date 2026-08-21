@@ -225,7 +225,8 @@ const apoiadoresFiltrados = useMemo(() => {
       .includes(busca.toLowerCase())
   )
 }, [apoiadores, busca])
-if (!sessao) {
+const cadastroPublico = window.location.pathname === '/cadastro'
+if (!sessao && !cadastroPublico) {
   return <Login onLogin={setSessao} />
 }
     
@@ -375,16 +376,20 @@ function exportarPDF() {
 
   doc.save('apoiadores.pdf')
 }
+if (!sessao && !cadastroPublico) {
+  return <Login onLogin={setSessao} />
+}
   return (
     <main className="pagina">
 
+    
       <header className="cabecalho">
 
         <div className="cabecalho-conteudo">
 
           <div>
 
-            <p className="marca">JORNADA</p>
+           
 
             <h1>Plataforma JORNADA
               
@@ -393,7 +398,7 @@ function exportarPDF() {
             <p>Gestão de apoiadores</p>
 
           </div>
-
+{!cadastroPublico && (
           <div className="resumo">
 
             <strong>{apoiadores.length}</strong>
@@ -401,7 +406,7 @@ function exportarPDF() {
             <span>Apoiadores cadastrados</span>
 
           </div>
-
+)}
  <div className="usuario-logado">
   <span>{usuario?.email}</span>
 {perfil && <small>Perfil: {perfil.role}</small>}
@@ -419,7 +424,7 @@ function exportarPDF() {
         </div>
 
       </header>      <section className="container">
-        {['admin', 'coordenador'].includes(perfil?.role) && (
+        {(cadastroPublico || ['admin', 'coordenador'].includes(perfil?.role)) && (
         <article className="card">
           <div className="titulo-card">
             <div>
@@ -598,7 +603,7 @@ function exportarPDF() {
   {apoiadores.length} registros encontrados
 </p>
             </div>
-            {perfil?.role !== 'consulta' && (
+            {!cadastroPublico && perfil?.role !== 'consulta' && (
   <>
     <button
       type="button"
@@ -658,6 +663,7 @@ function exportarPDF() {
               Nenhum apoiador encontrado.
             </p>
           ) : (
+            
             <div className="tabela-container">
               <table>
                 <thead>
@@ -729,7 +735,8 @@ function exportarPDF() {
                 </tbody>
               </table>
             </div>
-          )}
+                )}
+
         </article>
       </section>
 
