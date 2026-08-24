@@ -319,7 +319,7 @@ if (!sessao && !cadastroPublico) {
   const numero = telefone.replace(/\D/g, '')
 
   const mensagem = encodeURIComponent(
-    `Olá, ${nome}! Tudo bem? Estou entrando em contato pela Plataforma Jornada.`
+    'Oi, ${nome}! Espero que esteja tudo certo por aí. Queria te pedir um apoio ao candidato a Deputado Federal Jornada, número 1233. Se puder fortalecer com seu voto e compartilhar com quem confia, ficaremos muito gratos. Vamos juntos por um Amazonas melhor! Obrigado pela força! 💙'
   )
 
   window.open(`https://wa.me/55${numero}?text=${mensagem}`)
