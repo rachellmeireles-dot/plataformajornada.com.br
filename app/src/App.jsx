@@ -219,7 +219,10 @@ const apoiadoresFiltrados = useMemo(() => {
       a.nome +
       a.telefone +
       a.bairro +
-      a.zona
+      a.zona +
+      +a.responsavel
+
+
     )
       .toLowerCase()
       .includes(busca.toLowerCase())
