@@ -318,9 +318,15 @@ if (!sessao && !cadastroPublico) {
  function abrirWhatsApp(telefone, nome) {
   const numero = telefone.replace(/\D/g, '')
 
-  const mensagem = encodeURIComponent(
-  'Oi! Espero que esteja tudo certo por aí. Queria te pedir um apoio ao candidato a Deputado Federal Jornada, número 1233. Se puder fortalecer com seu voto e compartilhar com quem confia, ficaremos muito gratos. Vamos juntos por um Amazonas melhor! Obrigado pela força! #Jornada1233'
-  )
+const mensagem = encodeURIComponent(
+  `Oi! Tudo bem? Passando para te pedir uma força nessa caminhada. Sou *Jornada, candidato a Deputado Federal, número 1233*, e quero contar com o seu voto e a sua confiança.
+
+Se você acredita que podemos fazer mais pelo nosso Amazonas, peço também que compartilhe meu nome com seus familiares, amigos e pessoas que confiam em você.
+
+Cada voto, cada mensagem e cada apoio fazem a diferença. Vamos juntos construir um Amazonas melhor! 🙏💙
+
+*Jornada 1233. Conto com você!*`
+)
 
   window.open(`https://wa.me/55${numero}?text=${mensagem}`)
 }
