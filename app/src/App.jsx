@@ -220,7 +220,7 @@ const apoiadoresFiltrados = useMemo(() => {
       a.telefone +
       a.bairro +
       a.zona +
-      +a.responsavel
+      a.responsavel
 
 
     )
