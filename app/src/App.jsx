@@ -79,6 +79,7 @@ function App() {
   const [formulario, setFormulario] = useState(formularioVazio)
   const [apoiadores, setApoiadores] = useState([])
   const [busca, setBusca] = useState('')
+  const [responsavelSelecionado, setResponsavelSelecionado] = useState('')
   const [editandoId, setEditandoId] = useState(null)
   const [sessao, setSessao] = useState(null)
   const usuario = sessao?.user
@@ -212,22 +213,57 @@ const dadosPorZona = useMemo(() => {
   }))
 }, [apoiadores])
 const apoiadoresFiltrados = useMemo(() => {
-  if (!busca) return apoiadores
+  if (responsavelSelecionado) {
+    return apoiadores.filter((a) => {
+      const responsavel = a.responsavel?.trim() || "Sem responsável"
 
-  return apoiadores.filter((a) =>
-    (
-      a.nome +
-      a.telefone +
-      a.bairro +
-      a.zona +
+      return (
+        responsavel.toLowerCase() ===
+        responsavelSelecionado.trim().toLowerCase()
+      )
+    })
+  }
+
+  if (!busca.trim()) return apoiadores
+
+  const termo = busca.trim().toLowerCase()
+
+  return apoiadores.filter((a) => {
+    const texto = [
+      a.nome,
+      a.telefone,
+      a.bairro,
+      a.zona,
+      a.comunidade,
       a.responsavel
-
-
-    )
+    ]
+      .filter(Boolean)
+      .join(" ")
       .toLowerCase()
-      .includes(busca.toLowerCase())
-  )
-}, [apoiadores, busca])
+
+    return texto.includes(termo)
+  })
+}, [apoiadores, busca, responsavelSelecionado])
+const quantidadePorResponsavel = useMemo(() => {
+  const contagem = {}
+
+  apoiadores.forEach((a) => {
+    const responsavel = a.responsavel?.trim() || "Sem responsável"
+
+    if (!contagem[responsavel]) {
+      contagem[responsavel] = 0
+    }
+
+    contagem[responsavel]++
+  })
+
+  return Object.entries(contagem)
+    .map(([responsavel, quantidade]) => ({
+      responsavel,
+      quantidade
+    }))
+    .sort((a, b) => b.quantidade - a.quantidade)
+}, [apoiadores])
 const cadastroPublico = window.location.pathname === '/cadastro'
 if (!sessao && !cadastroPublico) {
   return <Login onLogin={setSessao} />
@@ -667,6 +703,43 @@ if (!sessao && !cadastroPublico) {
     </BarChart>
   </ResponsiveContainer>
 </div>
+<div style={{ margin: '30px 0' }}>
+  <h3 style={{ textAlign: 'center', marginBottom: '15px' }}>
+    QUANTIDADE POR RESPONSÁVEL
+  </h3>
+
+  <div className="tabela-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Responsável</th>
+          <th>Quantidade</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {quantidadePorResponsavel.map((item) => (
+          <tr
+  key={item.responsavel}
+onClick={() => {
+  setResponsavelSelecionado(item.responsavel)
+  setBusca("")
+}}
+  style={{ cursor: "pointer" }}
+>
+            <td>{item.responsavel}</td>
+            <td>{item.quantidade}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+{busca && (
+  <h3 style={{ textAlign: "center", margin: "20px 0" }}>
+    {busca.toUpperCase()} — {apoiadoresFiltrados.length} APOIADORES
+  </h3>
+)}
           </div>          {apoiadoresFiltrados.length === 0 ? (
             <p className="estado-lista">
               Nenhum apoiador encontrado.
@@ -687,7 +760,18 @@ if (!sessao && !cadastroPublico) {
                 </thead>
 
                 <tbody>
-                  {apoiadoresFiltrados.map((apoiador) => (
+                 {apoiadoresFiltrados
+  .filter((apoiador) => {
+    if (!responsavelSelecionado) return true
+
+    const responsavel = apoiador.responsavel?.trim() || "Sem responsável"
+
+    return (
+      responsavel.toLowerCase() ===
+      responsavelSelecionado.trim().toLowerCase()
+    )
+  })
+  .map((apoiador) => (
                     <tr key={apoiador.id}>
                       <td>
                         <strong>{apoiador.nome}</strong>
