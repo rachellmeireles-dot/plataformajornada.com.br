@@ -80,6 +80,7 @@ function App() {
   const [apoiadores, setApoiadores] = useState([])
   const [busca, setBusca] = useState('')
   const [responsavelSelecionado, setResponsavelSelecionado] = useState('')
+  const [indiceWhatsApp, setIndiceWhatsApp] = useState(0)
   const [editandoId, setEditandoId] = useState(null)
   const [sessao, setSessao] = useState(null)
   const usuario = sessao?.user
@@ -799,6 +800,20 @@ onClick={() => {
   >
     Editar
   </button>
+  <button
+  type="button"
+  onClick={(e) => {
+    e.stopPropagation()
+    setResponsavelSelecionado(item.responsavel)
+    const contatosDoResponsavel = apoiadores.filter((a) => a.responsavel === item.responsavel && a.telefone)
+const contatoAtual = contatosDoResponsavel[indiceWhatsApp]
+if (contatoAtual) abrirWhatsApp(contatoAtual.telefone, contatoAtual.nome)
+  setIndiceWhatsApp((indiceWhatsApp + 1) % contatosDoResponsavel.length)
+    setBusca("")
+  }}
+>
+  WhatsApp
+</button>
 </td>
           </tr>
         ))}
