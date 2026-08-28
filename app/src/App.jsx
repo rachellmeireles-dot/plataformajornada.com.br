@@ -244,6 +244,34 @@ const apoiadoresFiltrados = useMemo(() => {
     return texto.includes(termo)
   })
 }, [apoiadores, busca, responsavelSelecionado])
+const contatosDuplicados = useMemo(() => {
+  const grupos = {}
+
+  apoiadores.forEach((a) => {
+    const telefone = (a.telefone || "").replace(/\D/g, "")
+
+    if (!telefone) return
+
+    const telefoneNormalizado = telefone.startsWith("55")
+      ? telefone.slice(2)
+      : telefone
+
+    if (!grupos[telefoneNormalizado]) {
+      grupos[telefoneNormalizado] = []
+    }
+
+    grupos[telefoneNormalizado].push(a)
+  })
+
+  return Object.entries(grupos)
+    .filter(([, registros]) => registros.length > 1)
+    .map(([telefone, registros]) => ({
+      telefone,
+      quantidade: registros.length,
+      registros,
+    }))
+    .sort((a, b) => b.quantidade - a.quantidade)
+}, [apoiadores])
 const quantidadePorResponsavel = useMemo(() => {
   const contagem = {}
 
@@ -353,6 +381,36 @@ if (!sessao && !cadastroPublico) {
 
     buscarApoiadores()
   }
+  async function editarResponsavel(nomeAtual) {
+  if (!nomeAtual || nomeAtual === "Sem responsável") return
+
+  const novoNome = window.prompt(
+    "Digite o novo nome do responsável:",
+    nomeAtual
+  )
+
+  if (!novoNome || novoNome.trim() === nomeAtual.trim()) return
+
+  const confirmar = window.confirm(
+    `Alterar todos os apoiadores de "${nomeAtual}" para "${novoNome.trim()}"?`
+  )
+
+  if (!confirmar) return
+
+  const { error } = await supabase
+    .from("apoiadores")
+    .update({ responsavel: novoNome.trim() })
+    .eq("responsavel", nomeAtual)
+
+  if (error) {
+    setErro(error.message)
+    return
+  }
+
+  setResponsavelSelecionado("")
+  setBusca("")
+  await buscarApoiadores()
+}
 
  function abrirWhatsApp(telefone, nome) {
   const numero = telefone.replace(/\D/g, '')
@@ -714,6 +772,7 @@ if (!sessao && !cadastroPublico) {
         <tr>
           <th>Responsável</th>
           <th>Quantidade</th>
+          <th>Ações</th>
         </tr>
       </thead>
 
@@ -729,6 +788,65 @@ onClick={() => {
 >
             <td>{item.responsavel}</td>
             <td>{item.quantidade}</td>
+            <td>
+  <button
+    type="button"
+    onClick={(e) => {
+      e.stopPropagation()
+      editarResponsavel(item.responsavel)
+    }}
+  >
+    Editar
+  </button>
+</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
+<div style={{ margin: "30px 0" }}>
+  <h3 style={{ textAlign: "center", marginBottom: "15px" }}>
+    CONTATOS DUPLICADOS — {contatosDuplicados.length}
+  </h3>
+
+  <div className="tabela-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Telefone</th>
+          <th>Quantidade</th>
+          <th>Nomes cadastrados</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {contatosDuplicados.map((grupo) => (
+          <tr key={grupo.telefone}>
+            <td>{grupo.telefone}</td>
+            <td>{grupo.quantidade}</td>
+            <td>
+              {grupo.registros.map((registro) => (
+  <div key={registro.id} style={{ marginBottom: "8px" }}>
+    <span>{registro.nome || "Sem nome"}</span>
+
+    <button
+      type="button"
+      onClick={() => editarApoiador(registro)}
+      style={{ marginLeft: "10px" }}
+    >
+      Editar
+    </button>
+<button
+  type="button"
+  onClick={() => excluirApoiador(registro)}
+  style={{ marginLeft: "10px" }}
+>
+  Excluir
+</button>
+  </div>
+))}
+            </td>
           </tr>
         ))}
       </tbody>
