@@ -761,6 +761,7 @@ if (!sessao && !cadastroPublico) {
     </BarChart>
   </ResponsiveContainer>
 </div>
+{!cadastroPublico && (
 <div style={{ margin: '30px 0' }}>
   <h3 style={{ textAlign: 'center', marginBottom: '15px' }}>
     QUANTIDADE POR RESPONSÁVEL
@@ -805,6 +806,8 @@ onClick={() => {
     </table>
   </div>
 </div>
+)}
+{!cadastroPublico && (
 <div style={{ margin: "30px 0" }}>
   <h3 style={{ textAlign: "center", marginBottom: "15px" }}>
     CONTATOS DUPLICADOS — {contatosDuplicados.length}
@@ -853,6 +856,7 @@ onClick={() => {
     </table>
   </div>
 </div>
+)}
 {busca && (
   <h3 style={{ textAlign: "center", margin: "20px 0" }}>
     {busca.toUpperCase()} — {apoiadoresFiltrados.length} APOIADORES
