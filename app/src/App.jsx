@@ -80,6 +80,7 @@ function App() {
   const [apoiadores, setApoiadores] = useState([])
   const [busca, setBusca] = useState('')
   const [responsavelSelecionado, setResponsavelSelecionado] = useState('')
+  const [mostrarCadastro, setMostrarCadastro] = useState(true)
   const [indiceWhatsApp, setIndiceWhatsApp] = useState(0)
   const [editandoId, setEditandoId] = useState(null)
   const [sessao, setSessao] = useState(null)
@@ -315,10 +316,18 @@ if (!sessao && !cadastroPublico) {
 
   async function salvarApoiador(e) {
     e.preventDefault()
-
-    const dados = {
+let telefoneCorrigido = formulario.telefone.replace(/\D/g, "")
+if (telefoneCorrigido.length === 10) {
+  telefoneCorrigido =
+    telefoneCorrigido.slice(0, 2) + "9" + telefoneCorrigido.slice(2)
+}
+if (telefoneCorrigido.length !== 11) {
+  setErro("Digite um telefone completo com DDD.")
+  return 
+}
+   const dados = {
       nome: formulario.nome,
-      telefone: formulario.telefone,
+      telefone: telefoneCorrigido,
       bairro: formulario.bairro,
       zona: formulario.zona,
       comunidade: formulario.comunidade,
@@ -532,11 +541,12 @@ if (!sessao && !cadastroPublico) {
         <article className="card">
           <div className="titulo-card">
             <div>
-              <h2>
-                {editandoId ? 'Editar apoiador' : 'Novo cadastro'}
+             <h2 onClick={() => setMostrarCadastro(!mostrarCadastro)} style={{ cursor: "pointer" }}>
+                {editandoId ? "Editar apoiador" : "Novo cadastro"} {mostrarCadastro ? "▼" : "►"}
               </h2>
 
               <p>Preencha os dados abaixo.</p>
+              
             </div>
 
             {editandoId && (
