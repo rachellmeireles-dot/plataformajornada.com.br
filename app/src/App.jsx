@@ -572,7 +572,7 @@ if (!sessao && !cadastroPublico) {
             </div>
           )}
 
-          <form onSubmit={salvarApoiador}>
+          <form onSubmit={salvarApoiador} style={{ display: mostrarCadastro ? "block" : "none" }}>
             <div className="grade-formulario">
               <label>
                 Nome completo *
