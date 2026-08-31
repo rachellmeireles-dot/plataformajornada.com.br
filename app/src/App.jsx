@@ -80,6 +80,7 @@ function App() {
   const [apoiadores, setApoiadores] = useState([])
   const [busca, setBusca] = useState('')
   const [responsavelSelecionado, setResponsavelSelecionado] = useState('')
+  const [bairroSelecionado, setBairroSelecionado] = useState('')
   const [mostrarCadastro, setMostrarCadastro] = useState(true)
   const [indiceWhatsApp, setIndiceWhatsApp] = useState(0)
   const [editandoId, setEditandoId] = useState(null)
@@ -89,7 +90,18 @@ function App() {
   const [carregando, setCarregando] = useState(false)
   const [mensagem, setMensagem] = useState('')
   const [erro, setErro] = useState('')
-
+  const bairros = [...new Set(
+  apoiadores
+    .map((apoiador) => apoiador.bairro?.trim())
+    .filter(Boolean)
+)].sort()
+const apoiadoresDoBairro = bairroSelecionado
+  ? apoiadores.filter(
+      (apoiador) =>
+        apoiador.bairro?.trim().toLowerCase() ===
+        bairroSelecionado.trim().toLowerCase()
+    )
+  : []
   useEffect(() => {
   buscarApoiadores()
 
@@ -743,7 +755,64 @@ if (!sessao && !cadastroPublico) {
               onChange={(e) => setBusca(e.target.value)}
               placeholder="Buscar por nome, telefone ou bairro"
             />
-            
+            <div style={{ margin: '20px 0' }}>
+  <select
+    value={bairroSelecionado}
+    onChange={(e) => setBairroSelecionado(e.target.value)}
+    style={{ padding: '10px', width: '100%', maxWidth: '400px' }}
+  >
+    <option value="">Selecione um bairro</option>
+
+    {bairros.map((bairro) => (
+      <option key={bairro} value={bairro}>
+        {bairro}
+      </option>
+    ))}
+  </select>
+
+  {bairroSelecionado && (
+    <div style={{ marginTop: '15px' }}>
+      <h3>
+        {bairroSelecionado} — {apoiadoresDoBairro.length} apoiadores
+      </h3>
+
+<table
+  style={{
+    width: '100%',
+    marginTop: '15px',
+    borderCollapse: 'collapse'
+  }}
+>
+  <thead>
+    <tr>
+      <th style={{ padding: '10px', textAlign: 'left' }}>Nome</th>
+      <th style={{ padding: '10px', textAlign: 'left' }}>Telefone</th>
+      <th style={{ padding: '10px', textAlign: 'left' }}>Responsável</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {apoiadoresDoBairro.map((pessoa) => (
+      <tr key={pessoa.id}>
+        <td style={{ padding: '10px' }}>
+          {pessoa.nome}
+        </td>
+
+        <td style={{ padding: '10px' }}>
+          {pessoa.telefone || '-'}
+        </td>
+
+        <td style={{ padding: '10px' }}>
+          {pessoa.responsavel || '-'}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+       
+    </div>
+  )}
+</div>
             <div style={{ width: '100%', height: 320, margin: '20px 0' }}>
               <h3 style={{ textAlign: 'center', margin: '20px 0 0' }}>
   Bairro
@@ -892,8 +961,9 @@ if (contatoAtual) abrirWhatsApp(contatoAtual.telefone, contatoAtual.nome)
               Nenhum apoiador encontrado.
             </p>
           ) : (
-            
+
             <div className="tabela-container">
+              
               <table>
                 <thead>
                   <tr>
@@ -931,7 +1001,14 @@ if (contatoAtual) abrirWhatsApp(contatoAtual.telefone, contatoAtual.nome)
                       </td>
 
                       <td>{apoiador.telefone || '-'}</td>
-                      <td>{apoiador.bairro || '-'}</td>
+<td>
+  <button
+    type="button"
+    onClick={() => setBairroSelecionado(apoiador.bairro)}
+  >
+    {apoiador.bairro || '-'}
+  </button>
+</td>
                       <td>{apoiador.zona || '-'}</td>
 
                       <td>
