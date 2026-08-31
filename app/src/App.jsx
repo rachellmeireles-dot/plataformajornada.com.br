@@ -81,6 +81,7 @@ function App() {
   const [busca, setBusca] = useState('')
   const [responsavelSelecionado, setResponsavelSelecionado] = useState('')
   const [bairroSelecionado, setBairroSelecionado] = useState('')
+  const [mostrarBairros, setMostrarBairros] = useState(true)
   const [mostrarCadastro, setMostrarCadastro] = useState(true)
   const [indiceWhatsApp, setIndiceWhatsApp] = useState(0)
   const [editandoId, setEditandoId] = useState(null)
@@ -756,6 +757,19 @@ if (!sessao && !cadastroPublico) {
               placeholder="Buscar por nome, telefone ou bairro"
             />
             <div style={{ margin: '20px 0' }}>
+              <button
+  type="button"
+  onClick={() => setMostrarBairros(!mostrarBairros)}
+  style={{
+    marginBottom: '10px',
+    padding: '8px 12px',
+    cursor: 'pointer'
+  }}
+>
+  {mostrarBairros ? '▼' : '▶'} Apoiadores por Bairro
+</button>
+{mostrarBairros && (
+  <>
   <select
     value={bairroSelecionado}
     onChange={(e) => setBairroSelecionado(e.target.value)}
@@ -812,8 +826,13 @@ if (!sessao && !cadastroPublico) {
        
     </div>
   )}
+  </>
+)}
 </div>
-            <div style={{ width: '100%', height: 320, margin: '20px 0' }}>
+{mostrarBairros && (
+
+            <div 
+            style={{ width: '100%', height: 320, margin: '20px 0' }}>
               <h3 style={{ textAlign: 'center', margin: '20px 0 0' }}>
   Bairro
 </h3>
@@ -827,6 +846,7 @@ if (!sessao && !cadastroPublico) {
     </BarChart>
   </ResponsiveContainer>
 </div>
+)}
 <h3 style={{ textAlign: 'center', margin: '20px 0 0' }}>
   Apoiadores por zona
 </h3>
