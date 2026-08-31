@@ -82,6 +82,7 @@ function App() {
   const [responsavelSelecionado, setResponsavelSelecionado] = useState('')
   const [bairroSelecionado, setBairroSelecionado] = useState('')
   const [mostrarBairros, setMostrarBairros] = useState(true)
+  const [mostrarResponsaveis, setMostrarResponsaveis] = useState(false)
   const [mostrarCadastro, setMostrarCadastro] = useState(true)
   const [indiceWhatsApp, setIndiceWhatsApp] = useState(0)
   const [editandoId, setEditandoId] = useState(null)
@@ -863,6 +864,14 @@ if (!sessao && !cadastroPublico) {
 </div>
 {!cadastroPublico && (
 <div style={{ margin: '30px 0' }}>
+  <button
+  type="button"
+  onClick={() => setMostrarResponsaveis(!mostrarResponsaveis)}
+>
+  {mostrarResponsaveis ? '▼' : '▶'} Responsáveis
+</button>
+{mostrarResponsaveis && (
+  <>
   <h3 style={{ textAlign: 'center', marginBottom: '15px' }}>
     QUANTIDADE POR RESPONSÁVEL
   </h3>
@@ -919,6 +928,8 @@ if (contatoAtual) abrirWhatsApp(contatoAtual.telefone, contatoAtual.nome)
       </tbody>
     </table>
   </div>
+  </>
+)}
 </div>
 )}
 {!cadastroPublico && (
