@@ -749,7 +749,10 @@ if (!sessao && !cadastroPublico) {
       Exportar PDF
     </button>
   </>
+
+
 )}
+
             <input
               type="search"
               className="campo-busca"
@@ -757,6 +760,34 @@ if (!sessao && !cadastroPublico) {
               onChange={(e) => setBusca(e.target.value)}
               placeholder="Buscar por nome, telefone ou bairro"
             />
+            {busca && (
+  <div style={{ marginTop: "10px" }}>
+    {apoiadoresFiltrados.slice(0, 10).map((apoiador) => (
+      <div
+        key={apoiador.id}
+        style={{
+          padding: "10px",
+          borderBottom: "1px solid #ddd",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center"
+        }}
+      >
+        <div>
+          <strong>{apoiador.nome}</strong><br />
+          <span>{apoiador.telefone} — {apoiador.bairro}</span>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => editarApoiador(apoiador)}
+        >
+          Editar
+        </button>
+      </div>
+    ))}
+  </div>
+)}
             <div style={{ margin: '20px 0' }}>
               <button
   type="button"
