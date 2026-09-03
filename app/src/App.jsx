@@ -82,7 +82,7 @@ function App() {
   const [responsavelSelecionado, setResponsavelSelecionado] = useState('')
   const [bairroSelecionado, setBairroSelecionado] = useState('')
   const [mostrarBairros, setMostrarBairros] = useState(true)
-  const [mostrarResponsaveis, setMostrarResponsaveis] = useState(false)
+  const [mostrarResponsaveis, setMostrarResponsaveis] = useState(true)
   const [mostrarCadastro, setMostrarCadastro] = useState(true)
   const [indiceWhatsApp, setIndiceWhatsApp] = useState(0)
   const [editandoId, setEditandoId] = useState(null)
@@ -420,17 +420,28 @@ if (telefoneCorrigido.length !== 11) {
   )
 
   if (!confirmar) return
+const idsDoResponsavel = apoiadores
+  .filter(
+    (apoiador) =>
+      (apoiador.responsavel || "").trim().toLowerCase() ===
+      nomeAtual.trim().toLowerCase()
+  )
+  .map((apoiador) => apoiador.id)
 
-  const { error } = await supabase
-    .from("apoiadores")
-    .update({ responsavel: novoNome.trim() })
-    .eq("responsavel", nomeAtual)
+alert("IDs encontrados: " + idsDoResponsavel.length)
+ const { data, error } = await supabase
+  .from("apoiadores")
+  .update({ responsavel: novoNome.trim() })
+  .in("id", idsDoResponsavel)
+  .select()
+    
 
   if (error) {
     setErro(error.message)
     return
   }
-
+console.log("Responsáveis atualizados:", data)
+alert("Registros atualizados: " + data.length)
   setResponsavelSelecionado("")
   setBusca("")
   await buscarApoiadores()
