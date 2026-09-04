@@ -1100,7 +1100,7 @@ if (contatoAtual) abrirWhatsApp(contatoAtual.telefone, contatoAtual.nome)
   WhatsApp
 </button>
 
-{['admin', 'coordenador'].includes(perfil?.role) && (
+{!cadastroPublico && ['admin', 'coordenador'].includes(perfil?.role) && (
   <>                         <button
                             type="button"
                             className="botao-editar"
